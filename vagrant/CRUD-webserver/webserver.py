@@ -1,17 +1,32 @@
 from BaseHTTPServer import BaseHTTPRequestHandler,HTTPServer
 import cgi
-import database_read
+import database_CRUD
 
 class webserverHandler(BaseHTTPRequestHandler):
 
     def do_GET(self):
         try:
+            if self.path.endswith("/delete"):
+                self.send_response(200)
+                self.send_header('content-type','text/html')
+                self.end_headers()
+                id=self.path.split("/")[2]
+                name=database_CRUD.get_restaurant(id).name
+                output = ""
+                output += "<html><body>"
+                output += "<h1>Are you sure you want to delete "+name+"? </h1>"
+                output +="<form method='POST' enctype='multipart/form-data' action='/restaurants/%s/delete'>" % id
+                output += "<input type='submit' value='delete'>\
+                </form>"
+                output += "</body></html>"
+                self.wfile.write(output)
+                return
             if self.path.endswith("/edit"):
                 self.send_response(200)
                 self.send_header('content-type','text/html')
                 self.end_headers()
                 id=self.path.split("/")[2]
-                name=database_read.get_restaurant(id).name
+                name=database_CRUD.get_restaurant(id).name
                 output = ""
                 output += "<html><body>"
                 output += "<h1>"+name+"</h1>"
@@ -39,13 +54,14 @@ class webserverHandler(BaseHTTPRequestHandler):
                 self.send_response(200)
                 self.send_header('content-type','text/html')
                 self.end_headers()
-                restaurantList=database_read.list_all_restaurant()    
+                restaurantList=database_CRUD.list_all_restaurant()    
                 output=""
                 output +="<html><body>"
                 output += "<a href='/restaurants/new'>Make a new Restaurant here</a></br>"
                 
                 for restaurant in restaurantList: 
-                    options="<a href='restaurants/%s/edit'/>Edit</a> <a href=#>Delete</a>" %restaurant.id
+                    options="<a href='restaurants/%s/edit'/>Edit</a>" %restaurant.id
+                    options+="<a href='restaurants/%s/delete'>Delete</a>" %restaurant.id 
                     output += restaurant.name+" "+options+"</br>" 
                 self.wfile.write(output)
                 #print output
@@ -69,6 +85,18 @@ class webserverHandler(BaseHTTPRequestHandler):
     
     def do_POST(self):
         try:
+            if self.path.endswith("/delete"):
+                id=self.path.split("/")[2]
+                name=database_CRUD.get_restaurant(id)
+
+                database_CRUD.delete_restaurant(id)
+
+                self.send_response(301)
+                self.send_header('Content-type','text/html')
+                self.send_header('Location','/restaurants')
+                self.end_headers()
+                #print output
+                return
             if self.path.endswith("/edit"):
                 ctype,pdict=cgi.parse_header(self.headers.getheader('content-type'))
                 if ctype=='multipart/form-data':
@@ -76,9 +104,9 @@ class webserverHandler(BaseHTTPRequestHandler):
                     messagecontent=fields.get('newRestaurantName')
                 
                 id=self.path.split("/")[2]
-                name=database_read.get_restaurant(id)
+                name=database_CRUD.get_restaurant(id)
 
-                database_read.update_restaurant(id,messagecontent[0])
+                database_CRUD.update_restaurant(id,messagecontent[0])
 
                 self.send_response(301)
                 self.send_header('Content-type','text/html')
@@ -92,7 +120,7 @@ class webserverHandler(BaseHTTPRequestHandler):
                     fields=cgi.parse_multipart(self.rfile,pdict)
                     messagecontent=fields.get('newRestaurantName')
 
-                database_read.create_restaurant(messagecontent[0])
+                database_CRUD.create_restaurant(messagecontent[0])
 
                 self.send_response(301)
                 self.send_header('Content-type','text/html')
