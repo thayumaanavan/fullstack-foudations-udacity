@@ -1,4 +1,4 @@
-from flask import Flask,render_template,request,redirect,url_for,flash
+from flask import Flask,render_template,request,redirect,url_for,flash,jsonify
 import database_CRUD
 app=Flask(__name__)
 
@@ -9,7 +9,16 @@ def restaurantMenu(restaurant_id):
     items=database_CRUD.get_menu_item_by_restaurant(restaurant_id)
     return render_template('menu.html',restaurant=restaurant,items=items)
     
+#API Endpoint json (GET)
+@app.route('/restaurants/<int:restaurant_id>/menu/JSON/')
+def restaurantMenuJSON(restaurant_id):
+    restaurant=database_CRUD.get_restaurant(restaurant_id)
+    items=database_CRUD.get_menu_item_by_restaurant(restaurant_id)
+    return jsonify(MenuItems=[i.serialize for i in items])
 
+@app.route('/restaurants/<int:restaurant_id>/menu/<int:menu_id>/JSON/')
+def menuItem(restaurant_id,menu_id):
+    return jsonify(MenuItem=database_CRUD.get_menu_item(menu_id).serialize)
 # Task 1: Create route for newMenuItem function here
 
 @app.route('/restaurants/<int:restaurant_id>/new/')
