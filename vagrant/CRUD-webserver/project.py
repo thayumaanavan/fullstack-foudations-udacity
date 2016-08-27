@@ -1,4 +1,4 @@
-from flask import Flask,render_template,request,redirect,url_for
+from flask import Flask,render_template,request,redirect,url_for,flash
 import database_CRUD
 app=Flask(__name__)
 
@@ -23,6 +23,7 @@ def editMenuItem(restaurant_id, menu_id):
     if request.method == 'POST':
         name=request.form['name']
         editedItem=database_CRUD.update_Menu(menu_id,name)
+        flash("Item Edited successfully")
         return redirect(url_for('restaurantMenu',restaurant_id=restaurant_id))
     else:
         editedItem=database_CRUD.get_menu_item(menu_id)
@@ -36,6 +37,7 @@ def editMenuItem(restaurant_id, menu_id):
 def deleteMenuItem(restaurant_id, menu_id):
     if request.method == 'POST':
         database_CRUD.delete_menu(menu_id)
+        flash("Item Deleted successfully")
         return redirect(url_for('restaurantMenu',restaurant_id=restaurant_id))
     else:
         menu=database_CRUD.get_menu_item(menu_id)
@@ -43,5 +45,6 @@ def deleteMenuItem(restaurant_id, menu_id):
 
 
 if __name__=='__main__':
+    app.secret_key='super_secret_key'
     app.debug=True
     app.run(host='0.0.0.0',port=5000)
