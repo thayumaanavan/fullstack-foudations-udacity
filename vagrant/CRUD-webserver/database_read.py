@@ -10,8 +10,8 @@ session=DBSession()
 def list_all_restaurant():
     #read
     items=session.query(Restaurant).all()
-    for item in items:
-        print item.name
+    #for item in items:
+     #   print item.name
     return items
 
 #list_all_restaurant()
@@ -19,6 +19,16 @@ def list_all_restaurant():
 #Used for webserver CRUD
 def create_restaurant(restaurant_name):
     restaurant=Restaurant(name=restaurant_name)
+    session.add(restaurant)
+    session.commit()
+
+def get_restaurant(id):
+    restaurant=session.query(Restaurant).filter_by(id=id).one()
+    return restaurant
+
+def update_restaurant(id,name):
+    restaurant=get_restaurant(id)
+    restaurant.name=name
     session.add(restaurant)
     session.commit()
 
