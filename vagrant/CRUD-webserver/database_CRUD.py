@@ -37,6 +37,22 @@ def delete_restaurant(id):
     session.delete(restaurant)
     session.commit()
 
-def get_menu_item(restaurant_id):
+def get_menu_item_by_restaurant(restaurant_id):
     item=session.query(MenuItem).filter_by(restaurant_id=restaurant_id)
     return item;
+
+def get_menu_item(menu_id):
+    item=session.query(MenuItem).filter_by(id=menu_id).one()
+    return item
+
+def update_Menu(menu_id,name):
+    menu=get_menu_item(menu_id)
+    if name:
+        menu.name=name
+    session.add(menu)
+    session.commit()
+
+def delete_menu(menu_id):
+    item=get_menu_item(menu_id)
+    session.delete(item)
+    session.commit()
