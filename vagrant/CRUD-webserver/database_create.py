@@ -7,6 +7,7 @@ Base.metadata.bind=engine
 DBSession=sessionmaker(bind=engine)
 session=DBSession()
 
+
 myFirstRestaurant=Restaurant(name="Pizza Palace")
 session.add(myFirstRestaurant)
 session.commit()
