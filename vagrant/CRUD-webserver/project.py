@@ -1,21 +1,14 @@
-from flask import Flask
+from flask import Flask,render_template
 import database_CRUD
 app=Flask(__name__)
 
 @app.route('/')
 @app.route('/restaurants/<int:restaurant_id>/')
 def restaurantMenu(restaurant_id):
-    
+    restaurant=database_CRUD.get_restaurant(restaurant_id)
     items=database_CRUD.get_menu_item(restaurant_id)
-    output=""
-    for item in items:
-        output+=item.name
-        output+="</br>"
-        output+=item.price
-        output+="</br>"
-        output+=item.description
-        output+="</br>"
-    return output
+    return render_template('menu.html',restaurant=restaurant,items=items)
+    
 
 # Task 1: Create route for newMenuItem function here
 
